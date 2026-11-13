@@ -1,0 +1,879 @@
+{
+  "info": {
+    "_postman_id": "4fff77fe-602b-4bf3-bb18-b10cb04ccd61",
+    "name": "EA2 - MongoDB Sensores CRUD",
+    "description": "Coleccion de pruebas funcionales para la API de sensores industriales (EA2 - Tecnologias Web). Cubre el CRUD completo, las operaciones por identificador, y los casos de error (validaciones, 404, 409).\n\nOrden recomendado: ejecutar las carpetas 01, 02 y 03 en orden (una por una, o con 'Run collection'), tomar las capturas de pantalla necesarias, y recien al final ejecutar la carpeta 04 - Limpieza para dejar la base de datos como estaba.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:5000",
+      "type": "string"
+    },
+    {
+      "key": "sensor_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sensor_id_extra",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - CRUD principal",
+      "item": [
+        {
+          "name": "1. POST Crear sensor - Temperatura",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ]
+            },
+            "description": "Crea un sensor de temperatura valido. Debe responder 201 Created.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"temperatura\",\n  \"valor\": 25.5,\n  \"ubicacion\": \"Planta A\",\n  \"fecha\": \"2026-11-13T10:30:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"La respuesta tiene _id y tipo correcto\", function () {",
+                  "    const datos = pm.response.json();",
+                  "    pm.expect(datos).to.have.property(\"_id\");",
+                  "    pm.expect(datos.tipo).to.eql(\"temperatura\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. POST Crear sensor - Presion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ]
+            },
+            "description": "Crea un sensor de presion valido. Debe responder 201 Created.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"presion\",\n  \"valor\": 120,\n  \"ubicacion\": \"Planta B\",\n  \"fecha\": \"2026-11-13T11:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"El tipo creado es presion\", function () {",
+                  "    pm.expect(pm.response.json().tipo).to.eql(\"presion\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. POST Crear sensor - Vibracion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ]
+            },
+            "description": "Crea un sensor de vibracion valido. Su _id se guarda en la variable de coleccion 'sensor_id' para usarlo luego en las operaciones por ID.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"vibracion\",\n  \"valor\": 2,\n  \"ubicacion\": \"Planta C\",\n  \"fecha\": \"2026-11-13T12:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const datos = pm.response.json();",
+                  "",
+                  "// Solo guardamos el id si la variable esta vacia, para no",
+                  "// sobrescribir accidentalmente un identificador ya capturado.",
+                  "if (!pm.collectionVariables.get(\"sensor_id\")) {",
+                  "    pm.collectionVariables.set(\"sensor_id\", datos._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. GET Consultar todos los sensores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sensores/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ]
+            },
+            "description": "Lista todos los sensores existentes. Debe responder 200 OK con un arreglo JSON."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"La respuesta es un arreglo (lista) JSON\", function () {",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. GET Filtrar por tipo (temperatura)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sensores/?tipo=temperatura",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "temperatura"
+                }
+              ]
+            },
+            "description": "Lista unicamente los sensores de tipo temperatura."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Todos los resultados son de tipo temperatura\", function () {",
+                  "    const datos = pm.response.json();",
+                  "    datos.forEach(function (sensor) {",
+                  "        pm.expect(sensor.tipo).to.eql(\"temperatura\");",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. PUT Actualizar sensor por tipo (temperatura)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/temperatura",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                "temperatura"
+              ]
+            },
+            "description": "Actualiza el valor del unico sensor de tipo temperatura. Debe responder 200 OK.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 40\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"El valor quedo actualizado\", function () {",
+                  "    pm.expect(pm.response.json().valor).to.eql(40);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7. DELETE Eliminar sensor por tipo (presion)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sensores/presion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                "presion"
+              ]
+            },
+            "description": "Elimina el unico sensor de tipo presion. Debe responder 200 OK."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"La respuesta confirma la eliminacion\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"mensaje\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 - Operaciones por ID",
+      "item": [
+        {
+          "name": "8. PUT Actualizar sensor por ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/id/{{sensor_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                "id",
+                "{{sensor_id}}"
+              ]
+            },
+            "description": "Actualiza el sensor de vibracion creado en el paso 3, usando su _id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ubicacion\": \"Planta C - zona 2\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"La ubicacion quedo actualizada y el tipo no cambio\", function () {",
+                  "    const datos = pm.response.json();",
+                  "    pm.expect(datos.ubicacion).to.eql(\"Planta C - zona 2\");",
+                  "    pm.expect(datos.tipo).to.eql(\"vibracion\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "9. DELETE Eliminar sensor por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sensores/id/{{sensor_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                "id",
+                "{{sensor_id}}"
+              ]
+            },
+            "description": "Elimina el sensor de vibracion por su _id."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Limpiamos la variable para no reusar un id que ya fue eliminado.",
+                  "pm.collectionVariables.set(\"sensor_id\", \"\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Validaciones y errores",
+      "item": [
+        {
+          "name": "10. POST Sensor invalido - tipo no permitido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ]
+            },
+            "description": "Intenta crear un sensor con un tipo que no existe ('humedad'). Debe responder 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"humedad\",\n  \"valor\": 10,\n  \"ubicacion\": \"Planta D\",\n  \"fecha\": \"2026-11-13T10:30:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"La respuesta incluye un mensaje de error\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11. POST Sensor invalido - valor fuera de rango",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ]
+            },
+            "description": "Intenta crear un sensor de temperatura con un valor fuera del rango permitido (-10 a 100). Debe responder 400.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"temperatura\",\n  \"valor\": 500,\n  \"ubicacion\": \"Planta D\",\n  \"fecha\": \"2026-11-13T10:30:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"La respuesta incluye un mensaje de error\", function () {",
+                  "    pm.expect(pm.response.json()).to.have.property(\"error\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12. PUT Sensor inexistente (404)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/vibracion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                "vibracion"
+              ]
+            },
+            "description": "Intenta actualizar un sensor de tipo vibracion, pero ya no existe ninguno (se elimino en el paso 9). Debe responder 404.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13a. POST Crear sensor conflicto A (presion)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ]
+            },
+            "description": "Paso de preparacion: crea el primero de dos sensores de presion, para poder probar el conflicto 409 del siguiente paso.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"presion\",\n  \"valor\": 100,\n  \"ubicacion\": \"Planta E - zona 1\",\n  \"fecha\": \"2026-11-13T13:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (!pm.collectionVariables.get(\"sensor_id\")) {",
+                  "    pm.collectionVariables.set(\"sensor_id\", pm.response.json()._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13b. POST Crear sensor conflicto B (presion)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sensores/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ]
+            },
+            "description": "Paso de preparacion: crea el segundo sensor de presion. Ahora hay 2 sensores de tipo presion al mismo tiempo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"presion\",\n  \"valor\": 200,\n  \"ubicacion\": \"Planta E - zona 2\",\n  \"fecha\": \"2026-11-13T13:05:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (!pm.collectionVariables.get(\"sensor_id_extra\")) {",
+                  "    pm.collectionVariables.set(\"sensor_id_extra\", pm.response.json()._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13. DELETE con multiples coincidencias (409)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sensores/presion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                "presion"
+              ]
+            },
+            "description": "Intenta eliminar 'el' sensor de presion, pero hay 2 al mismo tiempo (creados en 13a/13b). Debe responder 409 Conflict y NO eliminar ningun documento."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test(\"El mensaje sugiere usar el identificador\", function () {",
+                  "    pm.expect(pm.response.json().error).to.include(\"id\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Limpieza",
+      "item": [
+        {
+          "name": "14. DELETE Eliminar sensor por tipo (temperatura) - limpieza",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sensores/temperatura",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                "temperatura"
+              ]
+            },
+            "description": "Limpieza: elimina el sensor de temperatura creado en el paso 1/actualizado en el paso 6."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15. DELETE Eliminar sensor por ID (conflicto A) - limpieza",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sensores/id/{{sensor_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                "id",
+                "{{sensor_id}}"
+              ]
+            },
+            "description": "Limpieza: elimina el primer sensor de presion creado para la prueba de conflicto (13a)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set(\"sensor_id\", \"\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "16. DELETE Eliminar sensor por ID (conflicto B) - limpieza",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sensores/id/{{sensor_id_extra}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                "id",
+                "{{sensor_id_extra}}"
+              ]
+            },
+            "description": "Limpieza: elimina el segundo sensor de presion creado para la prueba de conflicto (13b)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set(\"sensor_id_extra\", \"\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "17. GET Verificar coleccion vacia - limpieza",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sensores/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sensores",
+                ""
+              ]
+            },
+            "description": "Verifica que, tras la limpieza, no quede ningun sensor de los creados en esta practica."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code es 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"La coleccion quedo vacia\", function () {",
+                  "    pm.expect(pm.response.json()).to.eql([]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+newman
+
+EA2 - MongoDB Sensores CRUD
+
+□ 01 - CRUD principal
+└ 1. POST Crear sensor - Temperatura
+  POST http://127.0.0.1:5000/sensores/ [201 CREATED, 316B, 1354ms]
+  √  Status code es 201
+  √  La respuesta tiene _id y tipo correcto
+
+└ 2. POST Crear sensor - Presion
+  POST http://127.0.0.1:5000/sensores/ [201 CREATED, 313B, 12ms]
+  √  Status code es 201
+  √  El tipo creado es presion
+
+└ 3. POST Crear sensor - Vibracion
+  POST http://127.0.0.1:5000/sensores/ [201 CREATED, 313B, 11ms]
+  √  Status code es 201
+
+└ 4. GET Consultar todos los sensores
+  GET http://127.0.0.1:5000/sensores/ [200 OK, 641B, 11ms]
+  √  Status code es 200
+  √  La respuesta es un arreglo (lista) JSON
+
+└ 5. GET Filtrar por tipo (temperatura)
+  GET http://127.0.0.1:5000/sensores/?tipo=temperatura [200 OK, 329B, 9ms]
+  √  Status code es 200
+  √  Todos los resultados son de tipo temperatura
+
+└ 6. PUT Actualizar sensor por tipo (temperatura)
+  PUT http://127.0.0.1:5000/sensores/temperatura [200 OK, 311B, 13ms]
+  √  Status code es 200
+  √  El valor quedo actualizado
+
+└ 7. DELETE Eliminar sensor por tipo (presion)
+  DELETE http://127.0.0.1:5000/sensores/presion [200 OK, 273B, 13ms]
+  √  Status code es 200
+  √  La respuesta confirma la eliminacion
+
+□ 02 - Operaciones por ID
+└ 8. PUT Actualizar sensor por ID
+  PUT http://127.0.0.1:5000/sensores/id/6af77b841f3b1e53e6830ff8 [200 OK, 317B, 11ms]
+  √  Status code es 200
+  √  La ubicacion quedo actualizada y el tipo no cambio
+
+└ 9. DELETE Eliminar sensor por ID
+  DELETE http://127.0.0.1:5000/sensores/id/6af77b841f3b1e53e6830ff8 [200 OK, 254B, 12ms]
+  √  Status code es 200
+
+□ 03 - Validaciones y errores
+└ 10. POST Sensor invalido - tipo no permitido
+  POST http://127.0.0.1:5000/sensores/ [400 BAD REQUEST, 266B, 6ms]
+  √  Status code es 400
+  √  La respuesta incluye un mensaje de error
+
+└ 11. POST Sensor invalido - valor fuera de rango
+  POST http://127.0.0.1:5000/sensores/ [400 BAD REQUEST, 261B, 9ms]
+  √  Status code es 400
+  √  La respuesta incluye un mensaje de error
+
+└ 12. PUT Sensor inexistente (404)
+  PUT http://127.0.0.1:5000/sensores/vibracion [404 NOT FOUND, 235B, 11ms]
+  √  Status code es 404
+
+└ 13a. POST Crear sensor conflicto A (presion)
+  POST http://127.0.0.1:5000/sensores/ [201 CREATED, 322B, 8ms]
+  √  Status code es 201
+
+└ 13b. POST Crear sensor conflicto B (presion)
+  POST http://127.0.0.1:5000/sensores/ [201 CREATED, 322B, 11ms]
+  √  Status code es 201
+
+└ 13. DELETE con multiples coincidencias (409)
+  DELETE http://127.0.0.1:5000/sensores/presion [409 CONFLICT, 298B, 6ms]
+  √  Status code es 409
+  √  El mensaje sugiere usar el identificador
+
+□ 04 - Limpieza
+└ 14. DELETE Eliminar sensor por tipo (temperatura) - limpieza
+  DELETE http://127.0.0.1:5000/sensores/temperatura [200 OK, 277B, 11ms]
+  √  Status code es 200
+
+└ 15. DELETE Eliminar sensor por ID (conflicto A) - limpieza
+  DELETE http://127.0.0.1:5000/sensores/id/6af77b851f3b1e53e6830ff9 [200 OK, 254B, 8ms]
+  √  Status code es 200
+
+└ 16. DELETE Eliminar sensor por ID (conflicto B) - limpieza
+  DELETE http://127.0.0.1:5000/sensores/id/6af77b851f3b1e53e6830ffa [200 OK, 254B, 8ms]
+  √  Status code es 200
+
+└ 17. GET Verificar coleccion vacia - limpieza
+  GET http://127.0.0.1:5000/sensores/ [200 OK, 168B, 6ms]
+  √  Status code es 200
+  √  La coleccion quedo vacia
+
+┌─────────────────────────┬────────────────────┬───────────────────┐
+│                         │           executed │            failed │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│              iterations │                  1 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│                requests │                 19 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│            test-scripts │                 19 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│      prerequest-scripts │                  0 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│              assertions │                 30 │                 0 │
+├─────────────────────────┴────────────────────┴───────────────────┤
+│ total run duration: 3.1s                                         │
+├──────────────────────────────────────────────────────────────────┤
+│ total data received: 2.5kB (approx)                              │
+├──────────────────────────────────────────────────────────────────┤
+│ average response time: 80ms [min: 6ms, max: 1354ms, s.d.: 300ms] │
+└──────────────────────────────────────────────────────────────────┘

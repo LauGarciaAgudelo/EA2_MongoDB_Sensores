@@ -1,0 +1,28 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Archivos de Python compilados
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Variables de entorno y configuracion local
+.env
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Archivos temporales del sistema operativo / editor
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Empaquetado final de la actividad (se genera al cerrar el proyecto)
+*.zip
