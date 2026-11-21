@@ -115,10 +115,19 @@ function Get-ManagedProcess {
 }
 
 function Get-ListenerProcessIds {
-    return @(
-        Get-NetTCPConnection -State Listen -LocalPort 5000 -ErrorAction Stop |
-            Select-Object -ExpandProperty OwningProcess -Unique
-    )
+    try {
+        $connections = @(
+            Get-NetTCPConnection -State Listen -LocalPort 5000 -ErrorAction Stop
+        )
+    }
+    catch {
+        if ($_.FullyQualifiedErrorId -eq 'CmdletizationQuery_NotFound,Get-NetTCPConnection') {
+            return @()
+        }
+        throw
+    }
+
+    return @($connections | Select-Object -ExpandProperty OwningProcess -Unique)
 }
 
 function Wait-PortFree {
