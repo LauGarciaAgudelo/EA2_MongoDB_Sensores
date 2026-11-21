@@ -50,7 +50,7 @@ if ($InstallDependencies) {
         throw 'No se encontró el ejecutable de Python configurado.'
     }
 
-    $pythonVersion = & $PythonExecutable -c 'import sys; print("{}.{}".format(sys.version_info.major, sys.version_info.minor))'
+    $pythonVersion = & $PythonExecutable -c 'import sys; print(sys.version_info.major, sys.version_info.minor, sep=chr(46))'
     if ($LASTEXITCODE -ne 0 -or $pythonVersion.Trim() -ne '3.12') {
         throw 'El ejecutable configurado debe ser Python 3.12.'
     }
